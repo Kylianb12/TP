@@ -1,0 +1,62 @@
+import unittest
+from force_mot_de_passe import ForceMotDePasse
+from generateur_de_mot_de_passe import GenerateurMotDePasse
+from generateur_de_passphrase import GenerateurPassphrase
+
+class TestMotDePasse(unittest.TestCase):
+
+    def test_calculer_entropie_et_estimer_force(self):
+        mot_de_passe = "password"
+        entropie_donnée = 52
+        entropie_calculée = int(ForceMotDePasse.calculer_entropie(len(mot_de_passe), 94))
+        force_calculée = ForceMotDePasse.estimer_force(entropie_calculée)
+        print(f"Entropie donnée : {(entropie_donnée)} bits")
+        print(f"Entropie calculée : {(entropie_calculée)} bits")
+        print(f"Force calculé : {force_calculée}")
+        if entropie_calculée == entropie_donnée :
+            print("Le test est bon.")
+        else:
+            print("Le test n'est pas bon.")
+
+
+    def test_generer_mot_de_passe(self):
+        # Appeler la fonction de génération de mot de passe
+        mot_de_passe, _, _ = GenerateurMotDePasse.generer_mot_de_passe(20, 5, 5, 5, 5)
+        print(f"Mot de passe : {mot_de_passe}")
+
+        # Vérifier que le mot de passe généré a le bon nombre de minuscules et de chiffres
+        nb_minuscules = sum(c.islower() for c in mot_de_passe)
+        nb_chiffres = sum(c.isdigit() for c in mot_de_passe)
+        print (f"Le nombre de minuscule dans le mdp est de {nb_minuscules}")
+        print (f"Le nombre de chiffre dans le mdp est de {nb_chiffres}")
+        if nb_minuscules == 5 & nb_chiffres == 5:
+            print("Le test est bon.")
+        else:
+            print("Le test n'est pas bon.")
+
+class TestGenerateurPassphrase(unittest.TestCase):
+    def test_generer_passphrase(self):
+        chemin_fichier = 'C:/Users/kbekh/TP1/Projet2/wordlist.txt'
+        generateur_passphrase = GenerateurPassphrase()
+        passphrase = generateur_passphrase.generer_passphrase(chemin_fichier)
+        print("Votre passphrase est :", passphrase)
+
+        # Vérifie si la passphrase a le nombre de mots spécifié
+        mots_passphrase = passphrase.split(' - ')
+        if len(mots_passphrase) != 6:
+            print("Erreur : Le nombre de mots dans la passphrase est incorrect.")
+        else:
+            print("Le nombre de mots dans la passphrase est correct.")
+
+            # Vérifie si tous les mots de la passphrase sont dans le fichier wordlist.txt
+            with open(chemin_fichier, 'r', encoding='utf-8') as fichier:
+                liste_mots_wordlist = [ligne.strip().split()[1] for ligne in fichier.readlines()]
+
+            for mot in mots_passphrase:
+                if mot not in liste_mots_wordlist:
+                    print(f"Erreur : {mot} n'est pas dans le fichier wordlist.txt.")
+                else:
+                    print(f"{mot} est dans le fichier wordlist.txt.")
+
+if __name__ == '__main__':
+    unittest.main()
